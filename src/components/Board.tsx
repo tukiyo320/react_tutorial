@@ -1,34 +1,18 @@
-import React, { useCallback, useMemo, useState } from 'react';
-import { BoardValue, SquareValue } from '../types/board';
-import { calculateWinner } from '../utils/boardHelper';
+import React, { useCallback } from 'react';
+import { SquareValue } from '../types/board';
 import { Square } from './Square';
 
-export const Board = () => {
-  const [squares, setSquares] = useState<SquareValue[]>(
-    new Array(9).fill(null)
-  );
-  const [xIsNext, setXIsNext] = useState<boolean>(true);
-  const nextPlayer = useMemo<BoardValue>(
-    () => (xIsNext ? 'X' : 'O'),
-    [xIsNext]
-  );
-  const winner = useMemo<SquareValue>(
-    () => calculateWinner(squares),
-    [squares]
-  );
+type Props = {
+  squares: SquareValue[];
+  onClick: (index: number) => void;
+};
+
+export const Board: React.FC<Props> = ({ squares, onClick }) => {
   const createHandleClick = useCallback(
     (i: number) => () => {
-      if (calculateWinner(squares) != null || squares[i]) {
-        return;
-      }
-      setSquares((state) => {
-        const newState = state.slice();
-        newState[i] = nextPlayer;
-        return newState;
-      });
-      setXIsNext((state) => !state);
+      onClick(i);
     },
-    [nextPlayer, squares]
+    [onClick]
   );
   const renderSquare = useCallback(
     (i: number) => {
@@ -39,9 +23,6 @@ export const Board = () => {
 
   return (
     <div>
-      <div className="status">
-        {winner != null ? `Winner: ${winner}` : `Next player: ${nextPlayer}`}
-      </div>
       <div className="board-row">
         {renderSquare(0)}
         {renderSquare(1)}
